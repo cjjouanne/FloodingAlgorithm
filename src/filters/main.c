@@ -3,6 +3,8 @@
 #include <string.h>
 #include "../imagelib/image.h"
 
+#include "charlie_tree.h"
+
 
 int main(int argc, char** argv)
 {
@@ -17,7 +19,9 @@ int main(int argc, char** argv)
 
     /* ------------- POR IMPLEMENTAR -------------- */
     /* Aqui debes crear el MaxTree de la imagen.    */
-
+    Charlie* charlie = init_tree(image, 0);
+    // recursive_inform(charlie->root, 0);
+    
     // Creamos una nueva imagen de igual tamaño, para el output
     Image* new_img = calloc(1, sizeof(Image));
     *new_img = (Image) {
@@ -35,7 +39,10 @@ int main(int argc, char** argv)
 
         /* ------------- POR IMPLEMENTAR -------------- */
         /* Aqui debes implementar el filtro delta y     */
+        int count = count_recursive(charlie->root);
+        recursive_delta(charlie->root, max_delta, image->pixel_count, count);
         /* guardar la imagen filtrada en new_img.       */
+        save_image(new_img, charlie);
 
     }
     else if (! strcmp("area", argv[3]))
@@ -46,8 +53,12 @@ int main(int argc, char** argv)
 
         /* ------------- POR IMPLEMENTAR -------------- */
         /* Aqui debes implementar el filtro de area y   */
+        printf("AREA FILTER IS RUNNING\n");
+        recursive_area(charlie->root, min_area, threshold);
         /* guardar la imagen filtrada en new_img.       */
-        
+        printf("UPDATING CHANGES\n");
+        save_image(new_img, charlie);
+
     }
 
     // Exportamos la nueva imagen
@@ -56,6 +67,7 @@ int main(int argc, char** argv)
     printf("Listo!\n");
 
     // Liberamos los recursos
+    destroy_charlie(charlie, image -> pixel_count);
     img_png_destroy(image);
     img_png_destroy(new_img);
 
