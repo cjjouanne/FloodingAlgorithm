@@ -30,6 +30,13 @@ Filtrar nodos con delta menor a 0.25:
 ### Resultados
 Al *testear* el programa con las Imagenes de prueba provistas por el curso en los niveles *Easy*, *Medium* y *Hard* se obtuvieron resultados **correctos** de manera **eficiente** (menos de 10 segundos sin usar Valgrind, y alrededor de 15 segundos en la imagen más grande utilizando Valgrind). Además, **_Valgrind_ indicó que el programa no tiene errores de memoria**, y que **no hay _memory leaks_**. El programa fue desarrollado y ejecutado con un procesador Intel® Core i5 2da generación, 4GB de RAM, GPU NVIDIA® GEFORCE 2GB, utilizando el sistema operativo Kali Linux.
 
+| Test   | Versión           | user     | system  | cpu    | total  |
+|--------| :---------------: |:--------:| :------:|:------:|-------:|
+| moon.png  | sin Valgrind            | 4.09s    | 0.03s   | 99%    | 4.122  |
+|        | con Valgrind                 | 12.3s    | 0.08s.  | 99%    | 12.40  |
+| plate.png  | sin Valgrind            | 4.09s    | 0.03s   | 99%    | 4.122  |
+|        | con Valgrind                 | 8.41s    | 0.10s.  | 99%    | 8.513  |
+
 > ⚠️ Para ejecutar el programa utilizando la imagen `campus.png`(version de 285.600 pixeles, 324.468 bytes) con **Valgrind** es necesario agregar el **flag** `--main-stacksize=19391577`
 
 ## Analisis
