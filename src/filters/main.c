@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
 #include "../imagelib/image.h"
 
 #include "charlie_tree.h"
@@ -9,6 +10,12 @@
 int main(int argc, char** argv)
 {
     // Revisamos los argumentos
+    
+    pthread_attr_t atr;
+    size_t size = 19391577;
+    pthread_attr_setstacksize(&atr, size);
+    
+
     if(argc < 4) {
         printf("Modo de uso: %s <input.png> <output.png> <command> [args]\n", argv[0]);
         return 1;

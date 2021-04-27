@@ -37,7 +37,11 @@ MTH=-lm
 # Portable Network Graphics (PNG)
 PNG=-lpng
 
-LIB=$(MTH) $(PNG)
+# PThreads
+
+PTH = -lpthread
+
+LIB=$(MTH) $(PNG) $(PTH)
 
 ###############################################################################
 # MÓDULOS Y PROGRAMAS                                                         #
