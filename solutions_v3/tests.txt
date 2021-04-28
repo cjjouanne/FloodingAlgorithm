@@ -1,6 +1,0 @@
-Los nombres de los archivos siguen lo siguiente
-- Primero el nombre del test
-- luego el tipo de filtro separado por un _
-- finalmente cada variable A, G o d separado por _
-- los números decimales del filtro delta no incluyen el punto, pero se asume que está después del primer cero
-
