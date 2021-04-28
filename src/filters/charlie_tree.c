@@ -279,7 +279,7 @@ void recursive_area(Node* node, int a, int g, int threshold)
 void recursive_delta(Node* node, float D, int parent_pixel_count)
 {
     float d = (float)(parent_pixel_count - node->pixel_count) / (float)parent_pixel_count;
-    if (d > D)
+    if (d >= D)
     {
         update_pixels(node, node -> parent -> threshold);
     }
