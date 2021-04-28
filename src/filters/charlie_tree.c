@@ -10,9 +10,7 @@ Charlie* init_tree(Image* image, int threshold)
     Node* root = malloc(sizeof(Node));
     charlie -> root = root;
     charlie -> pixels = malloc((image -> pixel_count) * sizeof(Pixel*));
-    charlie -> node_count = 1;
     root -> threshold = threshold;
-    root -> id = charlie -> node_count;
     root -> parent = NULL;
     root -> p_head = NULL;
     root -> p_tail = NULL;
@@ -20,43 +18,31 @@ Charlie* init_tree(Image* image, int threshold)
     root -> tail = NULL;
     root -> prev = NULL;
     root -> _next = NULL;
-    charlie -> node_count += 1;
-
+    root -> pixel_count = image -> pixel_count;
     for (int i = 0; i < image -> pixel_count; i++)
     {
-        add_pixel(root, i, image -> pixels[i], charlie -> pixels);
+        add_pixel(root, i, image -> pixels[i], charlie -> pixels, image->width, image->pixel_count);
     }
-
     init_leaf(root, image -> width, image -> pixel_count, charlie);
-
     return charlie;
 }
 
 void init_leaf(Node* node, int width, int pixel_count, Charlie* charlie)
 {
-    int smallest = get_smallest(node);
-    if (node -> threshold < smallest) {
-        node -> threshold = smallest;
-    }
-    bool ready = node_ready(node);
-    while (ready)
+    node -> threshold = get_smallest(node);
+    Pixel* first = get_first(node);
+    while (first)
     {
-        Pixel* first = get_first(node);
-        if (first)
-        {
-
-        }
         Node* leaf = malloc(sizeof(Node));
         leaf -> parent = node;
         leaf -> threshold = node -> threshold + 1;
-        leaf -> id = charlie -> node_count;
         leaf -> p_head = NULL;
         leaf -> p_tail = NULL;
         leaf -> head = NULL;
         leaf -> tail = NULL;
         leaf -> prev = NULL;
         leaf -> _next = NULL;
-        charlie -> node_count += 1;
+        leaf -> pixel_count = 0;
 
         if (node -> head == NULL)
         {
@@ -68,142 +54,95 @@ void init_leaf(Node* node, int width, int pixel_count, Charlie* charlie)
         node -> tail = leaf;
         add_to_neighborhood(first, leaf, width, pixel_count, charlie);
         init_leaf(leaf, width, pixel_count, charlie);
-        ready = node_ready(node);
+        first = get_first(node);
     }
 }
 
 void add_to_neighborhood(Pixel* pixel, Node* node, int width, int pixel_count, Charlie* charlie)
 {
-    if ((pixel -> node -> id != node -> id) && ((pixel -> value) >= (node -> threshold)))
+    add_pixel2(node, pixel);
+    if (pixel->rn == true)
     {
-        add_pixel2(node, pixel);
+        Pixel* right = charlie -> pixels[(pixel -> index) + 1];
+        if ((right -> node != node) && ((right -> value) >= (node -> threshold)))
+        {
+            add_to_neighborhood(right, node, width, pixel_count, charlie);
+        }
     }
-    if (pixel -> index < width)
+    if (pixel->ln == true)
     {
-        if (pixel -> index == 0)
+        Pixel* left = charlie -> pixels[(pixel -> index) - 1];
+        if ((left -> node != node) && ((left -> value) >= (node -> threshold)))
         {
-            Pixel* right = charlie -> pixels[(pixel -> index) + 1];
-            if ((right -> node -> id != node -> id) && ((right -> value) >= (node -> threshold)))
-            {
-                add_to_neighborhood(right, node, width, pixel_count, charlie);
-            }
+            add_to_neighborhood(left, node, width, pixel_count, charlie);
         }
-        else if (pixel -> index == width -1)
-        {
-            Pixel* left = charlie -> pixels[(pixel -> index) - 1];
-            if ((left -> node != node) && ((left -> value) >= (node -> threshold)))
-            {
-                add_to_neighborhood(left, node, width, pixel_count, charlie);
-            }
-        }
-        else
-        {
-            Pixel* right = charlie -> pixels[(pixel -> index) + 1];
-            Pixel* left = charlie ->pixels[(pixel -> index) - 1];
-            if ((right -> node -> id != node -> id) && (right -> value) >= node -> threshold)
-            {
-                add_to_neighborhood(right, node, width, pixel_count, charlie);
-            }
-            if ((left -> node -> id != node -> id) && (left -> value) >= node -> threshold)
-            {
-                add_to_neighborhood(left, node, width, pixel_count, charlie);
-            }
-        }
+    }
+    if (pixel->bn == true)
+    {
         Pixel* bottom = charlie -> pixels[(pixel -> index) + width];
-        if ((bottom -> node -> id != node -> id) && (bottom -> value) >= node -> threshold)
+        if ((bottom -> node != node) && ((bottom -> value) >= (node -> threshold)))
         {
             add_to_neighborhood(bottom, node, width, pixel_count, charlie);
         }
     }
-    else if (pixel -> index >= pixel_count - width)
-    {
-        if (pixel -> index == pixel_count - width)
-        {
-            Pixel* right = charlie -> pixels[(pixel -> index) + 1];
-            if ((right -> node -> id != node -> id) && (right -> value) >= node -> threshold)
-            {
-                add_to_neighborhood(right, node, width, pixel_count, charlie);
-            }
-        }
-        else if (pixel -> index == pixel_count - 1)
-        {
-            Pixel* left = charlie -> pixels[(pixel -> index) - 1];
-            if ((left -> node -> id != node -> id) && (left -> value) >= node -> threshold)
-            {
-                add_to_neighborhood(left, node, width, pixel_count, charlie);
-            }
-        }
-        else
-        {
-            Pixel* right = charlie -> pixels[(pixel -> index) + 1];
-            Pixel* left = charlie -> pixels[(pixel -> index) - 1];
-            if ((right -> node -> id != node -> id) && (right -> value) >= node -> threshold)
-            {
-                add_to_neighborhood(right, node, width, pixel_count, charlie);
-            }
-            if ((left -> node -> id != node -> id) && (left -> value) >= node -> threshold)
-            {
-                add_to_neighborhood(left, node, width, pixel_count, charlie);
-            }
-        }
-        Pixel* top = charlie -> pixels[(pixel -> index) - width];
-        if ((top -> node -> id != node -> id) && (top -> value) >= node -> threshold)
-        {
-            add_to_neighborhood(top, node, width, pixel_count, charlie);
-        }
-    }
-    else
+    if (pixel->tn == true)
     {
         Pixel* top = charlie -> pixels[(pixel -> index) - width];
-        Pixel* bottom = charlie -> pixels[(pixel -> index) + width];
-        if ((bottom -> node -> id != node -> id) && (bottom -> value) >= node -> threshold)
-        {
-            add_to_neighborhood(bottom, node, width, pixel_count, charlie);
-        }
-        if ((top -> node -> id != node -> id) && (top -> value) >= node -> threshold)
+        if ((top -> node != node) && ((top -> value) >= (node -> threshold)))
         {
             add_to_neighborhood(top, node, width, pixel_count, charlie);
-        }
-        if (((pixel -> index)) % width == 0)
-        {
-            Pixel* right = charlie -> pixels[(pixel -> index) + 1];
-            if ((right -> node -> id != node -> id) && (right -> value) >= node -> threshold)
-            {
-                add_to_neighborhood(right, node, width, pixel_count, charlie);
-            }
-        }
-        else if (((pixel -> index) +1) % width == 0)
-        {
-            Pixel* left = charlie -> pixels[(pixel -> index) - 1];
-            if ((left -> node -> id != node -> id) && (left -> value) >= node -> threshold)
-            {
-                add_to_neighborhood(left, node, width, pixel_count, charlie);
-            }
-        }
-        else
-        {
-            Pixel* right = charlie -> pixels[(pixel -> index) + 1];
-            Pixel* left = charlie -> pixels[(pixel -> index) - 1];
-            if ((right -> node -> id != node -> id) && (right -> value) >= node -> threshold)
-            {
-                add_to_neighborhood(right, node, width, pixel_count, charlie);
-            }
-            if ((left -> node -> id != node -> id) && (left -> value) >= node -> threshold)
-            {
-                add_to_neighborhood(left, node, width, pixel_count, charlie);
-            }
         }
     }
 }
 
-void add_pixel(Node* root, int index, int value, Pixel** pixels)
+void add_pixel(Node* root, int index, int value, Pixel** pixels, int width, int pixel_count)
 {
     Pixel* pixel = malloc(sizeof(Pixel));
     pixels[index] = pixel;
     pixel -> index = index;
     pixel -> value = value;
     pixel -> node = root;
-    pixel -> _next = NULL; 
+    pixel -> _next = NULL;
+    pixel -> rn = true;
+    pixel -> ln = true;
+    pixel -> bn = true;
+    pixel -> tn = true;
+    if (index == 0)
+    {
+        pixel -> ln = false;
+        pixel -> tn = false;
+    }
+    else if (index==width-1)
+    {
+        pixel -> rn = false;
+        pixel -> tn = false;
+    }
+    else if (index<width)
+    {
+        pixel -> tn = false;
+    }
+    else if (index == pixel_count-1)
+    {
+        pixel -> rn = false;
+        pixel -> bn = false;
+    }
+    else if (index== pixel_count-width)
+    {
+        pixel -> ln = false;
+        pixel -> bn = false;
+    }
+    else if (index>pixel_count-width)
+    {
+        pixel -> bn = false;
+    }
+    else if (index%width == 0)
+    {
+        pixel -> ln = false;
+    }
+    else if ((index+1)%width == 0)
+    {
+        pixel -> rn = false;
+    }
     if (root -> p_head == NULL)
     {
         root -> p_head = pixel;
@@ -249,6 +188,7 @@ void add_pixel2(Node* node, Pixel* pixel)
         pixel -> prev = node -> p_tail;
     }
     node -> p_tail = pixel;
+    node -> pixel_count += 1;
     pixel -> _next = NULL;
     pixel -> node = node;
 }
@@ -266,20 +206,6 @@ int get_smallest(Node* node)
         curr = curr -> _next;
     }
     return smallest;
-}
-
-bool node_ready(Node* node)
-{
-    Pixel* curr = node -> p_head;
-    while (curr)
-    {
-        if (curr -> value > node -> threshold)
-        {
-            return true;
-        }
-        curr = curr -> _next;
-    }
-    return NULL;
 }
 
 Pixel* get_first(Node* node)
@@ -311,26 +237,6 @@ void destroy_leaf(Node* node)
         
         destroy_leaf(prev);
     }
-    if ((node ->_next) && (node -> prev)) 
-    {
-        node -> _next -> prev = node -> prev;
-        node -> prev -> _next = node -> _next;
-    }
-    else if (node -> _next)
-    {
-        node -> parent -> head = node -> _next;
-        node -> _next -> prev = NULL;
-    }
-    else if (node -> prev)
-    {
-        node -> parent -> tail = node -> prev;
-        node -> prev -> _next = NULL;
-    }
-    else if (node -> parent)
-    {
-        node -> parent -> head = NULL;
-        node -> parent -> tail = NULL;
-    }
     free(node);
 }
 
@@ -345,46 +251,6 @@ void destroy_charlie(Charlie* charlie, int count)
     free(charlie);
 }
 
-void recursive_inform(Node* node, int depth)
-{
-    int count = count_pixels(node);
-    for (int i = 0; i < depth; i++)
-    {
-        printf(" ");
-    }
-    printf("%i:%i:%i\n", node -> id, node->threshold,count);
-    Node *curr = node -> head;
-    while (curr)
-    {
-        recursive_inform(curr, depth + 1);
-        curr = curr -> _next;
-    }
-}
-
-int count_pixels(Node* node)
-{
-    int count = 0;
-    Pixel* curr = node -> p_head;
-    while (curr)
-    {
-        count += 1;
-        curr = curr -> _next;
-    }
-    return count;
-}
-
-int count_recursive(Node* node)
-{
-    int count = count_pixels(node);
-    Node* curr = node -> head;
-    while (curr)
-    {
-        count += count_recursive(curr);
-        curr = curr -> _next;
-    }
-    return count;
-}
-
 void update_pixels(Node* node, int new_value)
 {
     Pixel* curr = node -> p_head;
@@ -396,53 +262,31 @@ void update_pixels(Node* node, int new_value)
     node -> threshold = new_value;
 }
 
-void area_filter(Node* node, int a, int g)
+void recursive_area(Node* node, int a, int g, int threshold)
 {
-    int count = count_recursive(node);
-    if ((count <= a ) || ((node -> threshold) <= g))
+     if ((node->pixel_count <= a ) || ((node -> threshold) <= g))
     {
-        if (node -> parent)
-        {
-            update_pixels(node, node -> parent -> threshold);
-        }
-        else
-        {
-            update_pixels(node, 0);
-        }
+        update_pixels(node, threshold);
     }
-}
-
-void delta_filter(Node* node, float D, int parent_pixel_count, int node_pixel_count)
-{
-    if (node -> parent)
-    {
-        float d = (float)(parent_pixel_count - node_pixel_count) / (float)parent_pixel_count;
-        if (d > D)
-        {
-            update_pixels(node, node -> parent -> threshold);
-        }
-    }
-}
-
-void recursive_area(Node* node, int a, int g)
-{
-    area_filter(node, a, g);
     Node* curr = node -> head;
     while (curr)
     {
-        recursive_area(curr, a, g);
+        recursive_area(curr, a, g, node->threshold);
         curr = curr -> _next;
     }
 }
 
-void recursive_delta(Node* node, float D, int parent_pixel_count, int node_pixel_count)
+void recursive_delta(Node* node, float D, int parent_pixel_count)
 {
-    delta_filter(node, D, parent_pixel_count, node_pixel_count);
+    float d = (float)(parent_pixel_count - node->pixel_count) / (float)parent_pixel_count;
+    if (d > D)
+    {
+        update_pixels(node, node -> parent -> threshold);
+    }
     Node* curr = node -> head;
     while (curr)
     {
-        int count = count_recursive(curr);
-        recursive_delta(curr, D, node_pixel_count, count);
+        recursive_delta(curr, D, node -> pixel_count);
         curr = curr -> _next;
     }
 }

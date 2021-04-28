@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <pthread.h>
 #include "../imagelib/image.h"
 
 #include "charlie_tree.h"
@@ -11,9 +10,10 @@ int main(int argc, char** argv)
 {
     // Revisamos los argumentos
     
+    /*
     pthread_attr_t atr;
-    size_t size = 19391577;
-    pthread_attr_setstacksize(&atr, size);
+    size_t size = 99391577;
+    pthread_attr_setstacksize(&atr, size);*/
     
 
     if(argc < 4) {
@@ -46,8 +46,7 @@ int main(int argc, char** argv)
 
         /* ------------- POR IMPLEMENTAR -------------- */
         /* Aqui debes implementar el filtro delta y     */
-        int count = count_recursive(charlie->root);
-        recursive_delta(charlie->root, max_delta, image->pixel_count, count);
+        recursive_delta(charlie->root, max_delta, image->pixel_count);
         /* guardar la imagen filtrada en new_img.       */
         save_image(new_img, charlie);
 
@@ -60,10 +59,8 @@ int main(int argc, char** argv)
 
         /* ------------- POR IMPLEMENTAR -------------- */
         /* Aqui debes implementar el filtro de area y   */
-        printf("AREA FILTER IS RUNNING\n");
-        recursive_area(charlie->root, min_area, threshold);
+        recursive_area(charlie->root, min_area, threshold, 0);
         /* guardar la imagen filtrada en new_img.       */
-        printf("UPDATING CHANGES\n");
         save_image(new_img, charlie);
 
     }

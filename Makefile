@@ -16,7 +16,7 @@ OBJ=obj
 # OPTIMIZACIÓN POR COMPILADOR (descomenta el que necesites, comenta el otro)  #
 ###############################################################################
 
-# OPT=-g # Guardar toda la información para poder debugear. No optimiza
+#OPT=-g # Guardar toda la información para poder debugear. No optimiza
 OPT=-O3 # Optimiza al máximo, descarta toda la información de debug.
 
 ###############################################################################
@@ -37,11 +37,7 @@ MTH=-lm
 # Portable Network Graphics (PNG)
 PNG=-lpng
 
-# PThreads
-
-PTH = -lpthread
-
-LIB=$(MTH) $(PNG) $(PTH)
+LIB=$(MTH) $(PNG)
 
 ###############################################################################
 # MÓDULOS Y PROGRAMAS                                                         #
