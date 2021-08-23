@@ -17,7 +17,8 @@ OBJ=obj
 ###############################################################################
 
 #OPT=-g # Guardar toda la información para poder debugear. No optimiza
-OPT=-O3 # Optimiza al máximo, descarta toda la información de debug.
+#OPT=-O3 # Optimiza al máximo, descarta toda la información de debug.
+OPT=-Ofast
 
 ###############################################################################
 # PARÁMETROS                                                                  #
